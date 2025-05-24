@@ -2,10 +2,13 @@ public class No {
     private String info;
     private boolean isFolha;
     private No[] vLig;
+    public static char[] alfabeto = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+    private int TL;
 
     public No (String info){
         this.info = info;
         vLig = new No[26];
+        TL = 0;
     }
 
     public String getInfo() {
@@ -30,5 +33,13 @@ public class No {
 
     public void setvLig(int pos, No no){
         vLig[pos] = no;
+    }
+
+    public void setTL(int TL){
+        this.TL = TL;
+    }
+
+    public int getTL(){
+        return this.TL;
     }
 }
