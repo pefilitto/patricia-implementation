@@ -72,12 +72,4 @@ public class PatriciaTree {
         }
         return igualdade;
     }
-
-    private String subtraiPrefixoComum(String string1, String string2) {
-        int i = 0;
-        while (i < string1.length() && i < string2.length() && string1.charAt(i) == string2.charAt(i)) {
-            i++;
-        }
-        return string1.substring(i);
-    }
 }
