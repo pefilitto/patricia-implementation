@@ -42,4 +42,16 @@ public class No {
     public int getTL(){
         return this.TL;
     }
+
+    public int encontraPosicaovLigPeloAlfabeto(char primeiraLetra){
+        for (int i = 0; i < alfabeto.length; i++) {
+            if(alfabeto[i] == primeiraLetra)
+                return i;
+        }
+        return -1;
+    }
+
+    public No[] getTodovLig(){
+        return this.vLig;
+    }
 }
