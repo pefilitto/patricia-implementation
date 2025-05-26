@@ -1,3 +1,7 @@
+package PatriciaTree;
+
+import Fila.Fila;
+
 public class PatriciaTree {
     private No raiz;
 
@@ -24,7 +28,6 @@ public class PatriciaTree {
                 }
             }
         }
-
         return null;
     }
 
@@ -54,6 +57,7 @@ public class PatriciaTree {
 
                             if (filho == null) {
                                 No novo = new No(restante);
+                                novo.setFolha(true);
                                 atual.setvLig(pos, novo);
                                 atual.setTL(atual.getTL() + 1);
                                 restante = "";
@@ -89,6 +93,7 @@ public class PatriciaTree {
 
         No restantePalavra1 = new No(prefixo.getInfo().substring(igualdadePalavras.length()));
         No restantePalavra2 = new No(palavra.substring(igualdadePalavras.length()));
+        restantePalavra2.setFolha(true);
 
         int pos1 = novoNo.encontraPosicaovLigPeloAlfabeto(restantePalavra1.getInfo().charAt(0));
         int pos2 = novoNo.encontraPosicaovLigPeloAlfabeto(restantePalavra2.getInfo().charAt(0));
@@ -98,7 +103,6 @@ public class PatriciaTree {
 
         if (prefixo.getTL() == 0) {
             restantePalavra1.setFolha(true);
-            restantePalavra2.setFolha(true);
             novoNo.setTL(2);
         }
         else {
@@ -109,6 +113,11 @@ public class PatriciaTree {
                     restantePalavra1.setTL(restantePalavra1.getTL() + 1);
                 }
             }
+
+            if (restantePalavra1.getTL() == 0) {
+                restantePalavra1.setFolha(true);
+            }
+            novoNo.setTL(2);
         }
 
         No pai = buscarPai(prefixo);
@@ -155,6 +164,34 @@ public class PatriciaTree {
             No filho = no.getvLig(i);
             if (filho != null) {
                 inOrdem(filho, novaPalavra);
+            }
+        }
+    }
+
+    public void exibePorNivel() {
+        Fila fila = new Fila();
+        fila.enqueue(raiz);
+        fila.enqueue(null);
+
+        while (!fila.isEmpty()) {
+            No aux = fila.dequeue().getInfo();
+
+            if (aux == null) {
+                System.out.println();
+                if (!fila.isEmpty()) {
+                    fila.enqueue(null);
+                }
+            } else {
+                if (!aux.getInfo().isEmpty()) {
+                    System.out.print(aux.getInfo() + " ");
+                }
+
+                for (int i = 0; i < aux.getTodovLig().length; i++) {
+                    No filho = aux.getvLig(i);
+                    if (filho != null) {
+                        fila.enqueue(filho);
+                    }
+                }
             }
         }
     }

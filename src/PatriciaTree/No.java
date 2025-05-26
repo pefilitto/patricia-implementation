@@ -1,3 +1,5 @@
+package PatriciaTree;
+
 public class No {
     private String info;
     private boolean isFolha;
