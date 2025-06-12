@@ -9,8 +9,9 @@ public class No {
 
     public No (String info){
         this.info = info;
-        vLig = new No[26];
-        TL = 0;
+        this.vLig = new No[26];
+        this.TL = 0;
+        this.isFolha = false;
     }
 
     public String getInfo() {
@@ -37,6 +38,10 @@ public class No {
         vLig[pos] = no;
     }
 
+    public void setvLig(No[] vLig) {
+        this.vLig = vLig;
+    }
+
     public void setTL(int TL){
         this.TL = TL;
     }
@@ -45,12 +50,18 @@ public class No {
         return this.TL;
     }
 
+    // Refatorado para não usar return dentro do laço
     public int encontraPosicaovLigPeloAlfabeto(char primeiraLetra){
-        for (int i = 0; i < alfabeto.length; i++) {
-            if(alfabeto[i] == primeiraLetra)
-                return i;
+        int pos = -1;
+        int i = 0;
+        // Laço continua enquanto a posição não for encontrada ou o alfabeto não acabar
+        while (i < alfabeto.length && pos == -1) {
+            if(alfabeto[i] == primeiraLetra) {
+                pos = i;
+            }
+            i++;
         }
-        return -1;
+        return pos;
     }
 
     public No[] getTodovLig(){

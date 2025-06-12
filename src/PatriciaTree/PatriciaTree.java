@@ -5,7 +5,7 @@ import Fila.Fila;
 public class PatriciaTree {
     private No raiz;
 
-    public PatriciaTree(){
+    public PatriciaTree() {
         raiz = null;
     }
 
@@ -14,137 +14,123 @@ public class PatriciaTree {
     }
 
     private No buscarPaiRecursivo(No atual, No alvo) {
-        if (atual == null) return null;
-
-        for (int i = 0; i < 26; i++) {
-            No filho = atual.getvLig(i);
-            if (filho != null) {
-                if (filho == alvo) {
-                    return atual;
+        No paiEncontrado = null;
+        if (atual != null) {
+            int i = 0;
+            while (i < 26 && paiEncontrado == null) {
+                No filho = atual.getvLig(i);
+                if (filho != null) {
+                    if (filho == alvo) {
+                        paiEncontrado = atual;
+                    } else {
+                        paiEncontrado = buscarPaiRecursivo(filho, alvo);
+                    }
                 }
-                No resultado = buscarPaiRecursivo(filho, alvo);
-                if (resultado != null) {
-                    return resultado;
-                }
+                i++;
             }
         }
-        return null;
+        return paiEncontrado;
     }
 
     public void inserir(String palavra) {
-        if (raiz == null) {
-            raiz = new No("");
-            No novoNo = new No(palavra);
-            int pos = raiz.encontraPosicaovLigPeloAlfabeto(palavra.charAt(0));
-            raiz.setvLig(pos, novoNo);
-            raiz.setTL(1);
-        } else {
-            char primeiraLetra = palavra.charAt(0);
-            No prefixo = encontraPrefixoRaiz(primeiraLetra);
-
-            if (prefixo != null) {
-                String igualdade = retornaIgualdadePalavras(prefixo.getInfo(), palavra);
-
-                if (igualdade.length() == prefixo.getInfo().length()) {
-                    String restante = palavra.substring(igualdade.length());
-
-                    if (!restante.isEmpty()) {
-                        No atual = prefixo;
-                        while (!restante.isEmpty()) {
-                            char letra = restante.charAt(0);
-                            int pos = atual.encontraPosicaovLigPeloAlfabeto(letra);
-                            No filho = atual.getvLig(pos);
-
-                            if (filho == null) {
-                                No novo = new No(restante);
-                                novo.setFolha(true);
-                                atual.setvLig(pos, novo);
-                                atual.setTL(atual.getTL() + 1);
-                                restante = "";
-                            } else {
-                                String igualdadeFilho = retornaIgualdadePalavras(filho.getInfo(), restante);
-
-                                if (igualdadeFilho.isEmpty() || igualdadeFilho.length() < filho.getInfo().length()) {
-                                    dividirNoExistente(filho, restante);
-                                    restante = "";
-                                } else {
-                                    restante = restante.substring(igualdadeFilho.length());
-                                    atual = filho;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    dividirNoExistente(prefixo, palavra);
-                }
-            } else {
+        if (palavra != null && !palavra.isEmpty()) {
+            if (raiz == null) {
+                raiz = new No("");
                 No novoNo = new No(palavra);
+                novoNo.setFolha(true);
                 int pos = raiz.encontraPosicaovLigPeloAlfabeto(palavra.charAt(0));
                 raiz.setvLig(pos, novoNo);
-                raiz.setTL(raiz.getTL() + 1);
-            }
-        }
-    }
+                raiz.setTL(1);
+            } else {
+                No atual = raiz;
+                String restante = palavra;
+                boolean inserido = false;
 
-    private void dividirNoExistente(No prefixo, String palavra) {
-        String igualdadePalavras = retornaIgualdadePalavras(prefixo.getInfo(), palavra);
+                while (!inserido) {
+                    char primeiraLetra = restante.charAt(0);
+                    int pos = atual.encontraPosicaovLigPeloAlfabeto(primeiraLetra);
+                    No filho = atual.getvLig(pos);
 
-        No novoNo = new No(igualdadePalavras);
+                    if (filho == null) {
+                        No novoNo = new No(restante);
+                        novoNo.setFolha(true);
+                        atual.setvLig(pos, novoNo);
+                        atual.setTL(atual.getTL() + 1);
+                        inserido = true;
+                    } else {
+                        String igualdade = retornaIgualdadePalavras(filho.getInfo(), restante);
 
-        No restantePalavra1 = new No(prefixo.getInfo().substring(igualdadePalavras.length()));
-        No restantePalavra2 = new No(palavra.substring(igualdadePalavras.length()));
-        restantePalavra2.setFolha(true);
-
-        int pos1 = novoNo.encontraPosicaovLigPeloAlfabeto(restantePalavra1.getInfo().charAt(0));
-        int pos2 = novoNo.encontraPosicaovLigPeloAlfabeto(restantePalavra2.getInfo().charAt(0));
-
-        novoNo.setvLig(pos1, restantePalavra1);
-        novoNo.setvLig(pos2, restantePalavra2);
-
-        if (prefixo.getTL() == 0) {
-            restantePalavra1.setFolha(true);
-            novoNo.setTL(2);
-        }
-        else {
-            for (int i = 0; i < prefixo.getTodovLig().length; i++) {
-                No filho = prefixo.getvLig(i);
-                if (filho != null) {
-                    restantePalavra1.setvLig(i, filho);
-                    restantePalavra1.setTL(restantePalavra1.getTL() + 1);
+                        if (igualdade.length() == restante.length()) {
+                            if (igualdade.length() == filho.getInfo().length()) {
+                                filho.setFolha(true);
+                            } else {
+                                dividirNoExistente(filho, restante);
+                            }
+                            inserido = true;
+                        } else if (igualdade.length() == filho.getInfo().length()) {
+                            restante = restante.substring(igualdade.length());
+                            atual = filho;
+                        } else {
+                            dividirNoExistente(filho, restante);
+                            inserido = true;
+                        }
+                    }
                 }
             }
-
-            if (restantePalavra1.getTL() == 0) {
-                restantePalavra1.setFolha(true);
-            }
-            novoNo.setTL(2);
-        }
-
-        No pai = buscarPai(prefixo);
-        if (pai != null) {
-            int pos = pai.encontraPosicaovLigPeloAlfabeto(prefixo.getInfo().charAt(0));
-            pai.setvLig(pos, novoNo);
-        } else {
-            int pos = raiz.encontraPosicaovLigPeloAlfabeto(prefixo.getInfo().charAt(0));
-            raiz.setvLig(pos, novoNo);
         }
     }
 
-    private No encontraPrefixoRaiz(char letra){
-        int pos = raiz.encontraPosicaovLigPeloAlfabeto(letra);
-        return raiz.getvLig(pos);
+    private void dividirNoExistente(No noExistente, String palavraNova) {
+        String infoExistente = noExistente.getInfo();
+        String igualdade = retornaIgualdadePalavras(infoExistente, palavraNova);
+
+        String restanteInfoExistente = infoExistente.substring(igualdade.length());
+        String restantePalavraNova = palavraNova.substring(igualdade.length());
+
+        No pai = buscarPai(noExistente);
+        if (pai == null) {
+            pai = this.raiz;
+        }
+        int posPai = pai.encontraPosicaovLigPeloAlfabeto(infoExistente.charAt(0));
+
+        No novoPai = new No(igualdade);
+        pai.setvLig(posPai, novoPai);
+
+        No novoFilhoExistente = new No(restanteInfoExistente);
+        novoFilhoExistente.setvLig(noExistente.getTodovLig());
+        novoFilhoExistente.setTL(noExistente.getTL());
+        novoFilhoExistente.setFolha(noExistente.isFolha());
+
+        int posFilhoExistente = novoPai.encontraPosicaovLigPeloAlfabeto(restanteInfoExistente.charAt(0));
+        novoPai.setvLig(posFilhoExistente, novoFilhoExistente);
+        novoPai.setTL(novoPai.getTL() + 1);
+
+        if (restantePalavraNova.isEmpty()) {
+            novoPai.setFolha(true);
+        } else {
+            No novoFilhoNovo = new No(restantePalavraNova);
+            novoFilhoNovo.setFolha(true);
+            int posFilhoNovo = novoPai.encontraPosicaovLigPeloAlfabeto(restantePalavraNova.charAt(0));
+            novoPai.setvLig(posFilhoNovo, novoFilhoNovo);
+            novoPai.setTL(novoPai.getTL() + 1);
+        }
     }
 
     private String retornaIgualdadePalavras(String string1, String string2) {
-        String igualdade = "";
+        StringBuilder igualdade = new StringBuilder();
         boolean flag = false;
-        for (int i = 0; i < string1.length() && i < string2.length() && !flag; i++) {
-            if (string1.charAt(i) == string2.charAt(i))
-                igualdade = igualdade.concat(String.valueOf(string1.charAt(i)));
-            else
+        int i = 0;
+        int minLength = Math.min(string1.length(), string2.length());
+
+        while(i < minLength && !flag) {
+            if (string1.charAt(i) == string2.charAt(i)) {
+                igualdade.append(string1.charAt(i));
+            } else {
                 flag = true;
+            }
+            i++;
         }
-        return igualdade;
+        return igualdade.toString();
     }
 
     public void inOrdem() {
@@ -152,48 +138,52 @@ public class PatriciaTree {
     }
 
     private void inOrdem(No no, String acumulado) {
-        if (no == null) return;
+        if (no != null) {
+            String novaPalavra = no == raiz ? "" : acumulado + no.getInfo();
 
-        String novaPalavra = acumulado + no.getInfo();
+            if (no.isFolha()) {
+                System.out.println(novaPalavra);
+            }
 
-        if (no.isFolha()) {
-            System.out.println(novaPalavra);
-        }
-
-        for (int i = 0; i < 26; i++) {
-            No filho = no.getvLig(i);
-            if (filho != null) {
-                inOrdem(filho, novaPalavra);
+            for (int i = 0; i < 26; i++) {
+                No filho = no.getvLig(i);
+                if (filho != null) {
+                    inOrdem(filho, novaPalavra);
+                }
             }
         }
     }
 
     public void exibePorNivel() {
-        Fila fila = new Fila();
-        fila.enqueue(raiz);
-        fila.enqueue(null);
+        if (raiz != null) {
+            Fila fila = new Fila();
+            fila.enqueue(raiz);
+            fila.enqueue(null);
 
-        while (!fila.isEmpty()) {
-            No aux = fila.dequeue().getInfo();
+            while (!fila.isEmpty()) {
+                No aux = fila.dequeue().getInfo();
 
-            if (aux == null) {
-                System.out.println();
-                if (!fila.isEmpty()) {
-                    fila.enqueue(null);
-                }
-            } else {
-                if (!aux.getInfo().isEmpty()) {
-                    System.out.print(aux.getInfo() + " ");
-                }
+                if (aux == null) {
+                    System.out.println();
+                    if (!fila.isEmpty()) {
+                        fila.enqueue(null);
+                    }
+                } else {
+                    if (aux != raiz && !aux.getInfo().isEmpty()) {
+                        String info = aux.getInfo() + (aux.isFolha() ? "[F]" : "");
+                        System.out.print(info + " ");
+                    } else if (aux == raiz) {
+                        System.out.print("RAIZ ");
+                    }
 
-                for (int i = 0; i < aux.getTodovLig().length; i++) {
-                    No filho = aux.getvLig(i);
-                    if (filho != null) {
-                        fila.enqueue(filho);
+                    for (int i = 0; i < aux.getTodovLig().length; i++) {
+                        No filho = aux.getvLig(i);
+                        if (filho != null) {
+                            fila.enqueue(filho);
+                        }
                     }
                 }
             }
         }
     }
-
 }
